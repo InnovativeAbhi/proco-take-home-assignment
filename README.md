@@ -1,6 +1,6 @@
 # proco-take-home-assignment
 
-## The provided code is Python scripts build in jupiter notebook for scraping data from the Franchise Supplier Network website. Here's a breakdown of the code functionalities:
+The provided code is Python scripts build in jupiter notebook for scraping data from the Franchise Supplier Network website. Here's a breakdown of the code functionalities:
 
 ## Features
 
