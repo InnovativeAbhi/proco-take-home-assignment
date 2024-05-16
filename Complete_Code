@@ -1,0 +1,774 @@
+# Home_details_text
+
+import requests as re
+from bs4 import BeautifulSoup
+import json
+import pandas as pd
+from IPython.display import HTML
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image
+
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+
+
+response  = re.get("https://franchisesuppliernetwork.com/", headers=headers)
+
+content = []
+
+soup = BeautifulSoup(response.text, 'html.parser')
+first_slider = soup.find('div', class_='slider-text')
+first_header = first_slider.find('h2').text
+first_para = first_slider.find('p').text
+first_para = '\n' + first_para + '\n'
+content.append(first_header)
+content.append(first_para)
+
+second_slider = soup.find('div', class_='home-why-choose-inner')
+second_header_h2 = second_slider.find('h2').text
+second_li = second_slider.find_all('li')
+for i in second_li:
+    second_slider_header_h3 = i.find('h3')
+    second_slider_header_para = i.find('p')
+    second_slider_header_h3 = second_slider_header_h3.text
+    second_slider_header_para = second_slider_header_para.text
+    second_slider_header_para = '\n' + second_slider_header_para + '\n'
+    content.append(second_slider_header_h3)
+    content.append(second_slider_header_para)
+
+third_slider = soup.find('div', class_='wrapper')
+third_slider_header = third_slider.find('h2')
+third_slider_header = third_slider_header.text
+content.append(third_slider_header)
+
+third_slider_logos_link = third_slider.find('div', class_='logos-inner')
+third_slider_logos_link = third_slider_logos_link.find_all('img')
+for i in third_slider_logos_link:
+    third_slider_logos_link = i['src']
+    third_slider_logos_link = '\n' + third_slider_logos_link
+    content.append(third_slider_logos_link)
+    
+    
+fourth_slider = soup.find('div', class_='process')
+fourth_slider_header = soup.find('h2')
+fourth_slider_header = fourth_slider_header.text
+fourth_slider_header = '\n'+fourth_slider_header+'\n'
+content.append(fourth_slider_header)
+fourth_slider_para = fourth_slider.find('p')
+fourth_slider_para = fourth_slider_para.text
+fourth_slider_para = '\n'+fourth_slider_para+'\n'
+content.append(fourth_slider_para)
+
+fourth_slider_sub = soup.find_all('div', class_='process-box')
+for i in fourth_slider_sub:
+    sub_img_class = i.find('div', class_='process-icon')
+    fourth_slider_sub_header = i.find('h3').text
+    fourth_slider_sub_header = '\n' + fourth_slider_sub_header + '\n'
+    content.append(fourth_slider_sub_header)
+    fourth_slider_sub_img = sub_img_class.find('img')
+    fourth_slider_sub_img = fourth_slider_sub_img['src']
+    fourth_slider_sub_img = '\n'+fourth_slider_sub_img+'\n'
+    content.append(fourth_slider_sub_img)
+    fourth_slider_sub_para = i.find('p').text
+    fourth_slider_sub_para = '\n' + fourth_slider_sub_para + '\n'
+    content.append(fourth_slider_sub_para)
+    
+fifth_slider = soup.find_all('section', class_='featured-suppliers home-fs')
+
+
+for slider in fifth_slider:
+    fifth_slider_header = slider.find('h2').text
+    fifth_slider_para = slider.find('p').text
+    
+    fifth_slider_header = '\n'+fifth_slider_header+'\n'
+    fifth_slider_para = '\n'+fifth_slider_para+'\n'
+    
+    content.append(fifth_slider_header)
+    content.append(fifth_slider_para)
+    
+    suppliers = slider.find_all('div', class_='fs-single')
+    
+    for supplier in suppliers:
+        supplier_heading = supplier.find('h3').text
+        supplier_heading = '\n' + supplier_heading + '\n'
+        content.append(supplier_heading)
+        
+        supplier_img_link = supplier.find_all('img')
+        for i in supplier_img_link: 
+            supplier_img_link = i['src']
+            supplier_img_link = '\n'+supplier_img_link+'\n'
+            content.append(supplier_img_link)
+        
+        supplier_page_link = supplier.find('a', class_='fs-link')['href']
+        supplier_page_link = '\n' +supplier_page_link+ '\n'
+        content.append(supplier_page_link)
+        
+        supplier_category = supplier.find('span', class_='fs-cat').text
+        content.append(supplier_category)
+        
+sixth_slider = soup.find('section',class_='hcwh-home')
+sixth_slider_header = sixth_slider.find('h2',class_='hcwh-title')
+sixth_slider_header = sixth_slider_header.text
+sixth_slider_header = '\n'+ sixth_slider_header + '\n'
+content.append(sixth_slider_header)
+sixth_slider_sub = sixth_slider.find('div', class_='hcwh-sec-01')
+sixth_slider_sub_heading = sixth_slider_sub.text
+sixth_slider_sub_heading = sixth_slider_sub_heading.replace('\n', '').replace('\t','').replace(' ','_').replace('\r',' ').replace(' ','\n')
+sixth_slider_sub_heading = '\n'+sixth_slider_sub_heading+'\n'
+content.append(sixth_slider_sub_heading)
+sixth_slider_sub_img = sixth_slider_sub.find_all('img')
+for i in sixth_slider_sub_img:
+    sixth_slider_sub_img = i['src']
+    sixth_slider_sub_img = '\n'+sixth_slider_sub_img+'\n'
+    content.append(sixth_slider_sub_img)
+
+seven_slider = sixth_slider.find_all('div', class_='col-md-7')
+for i in seven_slider:
+    seven_slider_sub_heading = i.find('h2').text
+    seven_slider_sub_heading = '\n'+seven_slider_sub_heading+'\n'
+    content.append(seven_slider_sub_heading)
+    seven_slider_sub_para = i.find('p').text
+    seven_slider_sub_para = '\n' +seven_slider_sub_para + '\n'
+    content.append(seven_slider_sub_para)
+
+
+content = '\n'.join(content)
+# print(content)
+
+path = f"C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Home_Details.text"
+
+with open(path, "w", encoding="utf-8") as file:
+    file.write(content)
+
+print('Successfully Created The File')  
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Home/Image_details/excel and download images
+
+import requests as re
+from bs4 import BeautifulSoup
+import json
+import pandas as pd
+from IPython.display import HTML
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image
+
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+
+
+response  = re.get("https://franchisesuppliernetwork.com/", headers=headers)
+
+soup = BeautifulSoup(response.text, 'html.parser')
+soup
+
+img_info_list = soup.find_all('img')
+
+
+Catagory = []
+
+for img in img_info_list:
+    alt_text = img['alt']
+    alt_text = str(alt_text).strip()
+    Catagory.append(alt_text)
+
+
+images = ['<img src="' + img['src'].strip() +'">' for img in img_info_list if img['src'].strip()]  # List comprehension for efficiency and filtering
+links = [img['src'].strip() for img in img_info_list if img['src'].strip()]
+
+file_names = []
+
+for name in links:
+    parts = name.split('/')
+    file_name_with_extension = parts[-1]
+    file_name = file_name_with_extension.split('.')[0]
+    file_names.append(file_name)
+    
+    
+
+
+data = {'Catagory': Catagory, 'File_Names': file_names, 'Images': images, 'Links': links}
+df = pd.DataFrame(data)
+
+pd.set_option('display.max_colwidth', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+
+df = df.drop_duplicates()
+
+# HTML(df.to_html(escape=False))
+
+path = 'C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Home_Img_Details.xlsx'
+
+df.to_excel(path, index = False)
+
+print('Successfully Created The excel')
+
+
+for index, row in df.iterrows():
+    Image_Links = row['Links']
+    file_name = Image_Links.split('/')[-1]
+
+    if Image_Links != "NA":  # Download only if image link exists
+        image_path = f"C:/Users/Kunwar Rajeev Singh/Desktop/Eseeassest Assignment/Image_folder/Home_Images/{file_name}"
+        with open(image_path, 'wb') as f:
+            im = re.get(Image_Links)
+            f.write(im.content)
+        print(f"Downloaded image: {Image_Links}")
+        
+        
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Home/Resource_details
+
+# This Code is the function to view or create deatils of Resource Page from the given website.
+
+import requests as re
+from bs4 import BeautifulSoup
+import json
+import pandas as pd
+import time
+from IPython.display import HTML
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+
+
+
+sub_classes = []
+ids = []
+image_alt = []
+image_src = []
+image_link = []
+catagories =[]
+heading = []
+paras = []
+
+for i in range(1,16):
+    base_url = 'https://franchisesuppliernetwork.com'
+    add_on = '/resources/'
+    page_url = f'page/{i}/'
+    url = base_url + add_on + page_url
+    response  = re.get(url, headers=headers)
+
+    soup = BeautifulSoup(response.text, 'lxml')
+
+    sub_divs = soup.find_all('div', class_=["single-news Podcast","single-news Post"])
+    sub_divs_2 = soup.find_all('div', class_="lncategory")
+
+
+    for i in sub_divs:
+        sub_class = i['class']
+        sub_class = sub_class[-1]
+        sub_classes.append(sub_class)
+
+    for i in sub_divs:
+        id = i['id']
+        ids.append(id)
+        time.sleep(1)
+
+    for i in sub_divs:
+        img_tag = i.find('img')
+        img_alt = img_tag['alt']
+        img_src = img_tag['src']
+        image_alt.append(img_alt)
+        image_src.append('<img src="'+ img_src + '">')
+        image_link.append(img_src)
+        time.sleep(1)
+
+
+    for i in sub_divs:
+        h = i.find('h3')
+        h = h.text
+        heading.append(h)
+        time.sleep(1)
+
+    for i in sub_divs:
+        p = i.find('p')
+        p = p.text
+        paras.append(p)
+        time.sleep(1)
+        
+
+        
+        
+# If want to just create a excel uncomment the below block of code and comment the last block of code.
+# data = {'Catagory': sub_classes, 'Resource_ID': ids ,'Image_link':image_link, 'Heading': heading, 'Meta Discription': paras,'Image_Alt': image_alt}
+# df = pd.DataFrame(data)
+# path = "C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Home_Resource_Detials.xlsx"
+# df.to_excel(path, index = False)
+
+
+
+# If want to just view the dataframe on jupiter notebook (this will display the images in the results)
+data = {'Catagory': sub_classes, 'Resource_ID': ids ,'Image_link':image_link,'Image_': image_src, 'Heading': heading, 'Meta Discription': paras,'Image_Alt': image_alt}
+df = pd.DataFrame(data)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+HTML(df.to_html(escape=False))
+    
+
+    
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+# Home/Resource_image_downloads
+
+#This block of code is to download all the pictures from the resource page of the given website
+
+
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import time
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+
+
+sub_classes = []
+ids = []
+image_alt = []
+image_src = []
+image_link = []
+catagories = []
+heading = []
+paras = []
+
+for i in range(1, 16):
+    base_url = 'https://franchisesuppliernetwork.com'
+    add_on = '/resources/'
+    page_url = f'page/{i}/'
+    url = base_url + add_on + page_url
+    response = requests.get(url, headers=headers)
+
+    soup = BeautifulSoup(response.text, 'lxml')
+
+    sub_divs = soup.find_all('div', class_=["single-news Podcast", "single-news Post"])
+
+    for i in sub_divs:
+        id = i['id']
+        ids.append(id)
+        time.sleep(1)
+
+    for i in sub_divs:
+        img_tag = i.find('img')
+        if img_tag:  # Check if image tag exists
+            img_src = img_tag['src']
+            image_link.append(img_src)
+            time.sleep(1)
+        else:
+            image_alt.append("NA")  # Add placeholder if no image found
+            image_src.append("NA")
+            image_link.append("NA")
+
+
+data = {'Resource_ID': ids, 'Image_link': image_link}
+
+df = pd.DataFrame(data)
+
+
+# Download images
+for index, row in df.iterrows():
+    Image_link = row['Image_link']
+    Resource_ID = row['Resource_ID']
+    file_name = Image_link.split('/')[-1]
+
+    if Image_link != "NA":  # Download only if image link exists
+        image_path = f"C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Image_folder/Home_Resource_Images/{file_name}"
+        with open(image_path, 'wb') as f:
+            im = requests.get(Image_link)
+            f.write(im.content)
+        print(f"Downloaded image: {Image_link}")
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Home/Resource/Individual_Blogs
+
+# This block of code is to download all the content of the individual resouces in the text format from the resource page of the given website
+
+
+import requests as re
+from bs4 import BeautifulSoup
+import json
+import pandas as pd
+import time
+from IPython.display import HTML
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+
+resource_blog_link_list = []
+
+for i in range(1,16):
+    base_url = 'https://franchisesuppliernetwork.com'
+    add_on = '/resources/'
+    page_url = f'page/{i}/'
+    url = base_url + add_on + page_url
+    response  = re.get(url, headers=headers)
+
+    soup = BeautifulSoup(response.text, 'lxml')
+
+    sub_divs = soup.find_all('div', class_=["single-news-inner"])
+    for i in sub_divs:
+        sub_divs = i.find('a' , class_="btn")
+        sub_divs = str(sub_divs).split('"')[3]
+        resource_blog_link_list.append(sub_divs)
+#         print(sub_divs)
+
+print(resource_blog_link_list)
+
+
+
+for i in resource_blog_link_list:
+    url = i
+    response  = re.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, 'lxml')
+
+    content = []
+
+
+    title_class = soup.find('section' ,class_='col-lg-12 contentside')
+    title_class = title_class.find('h1', class_='title')
+    title_class = title_class.text
+    title_class = 'Title : ' + title_class + '\n'
+    content.append(title_class)
+
+
+    img_class = soup.find_all('div' ,class_='col-sm-12')
+    img_class = img_class[1:]
+    for i in img_class:
+        img_class_h = i.find_all('h2', class_='wp-block-heading')
+        img_class_p = i.find_all('p')
+        if img_class_h == []:
+            for y in img_class_p:
+                    if y != None:
+                        img_class_p = y.text
+                        img_class_p = 'Paragraph : ' + img_class_p + '\n'
+                        content.append(img_class_p)
+
+        else:
+            for i, y in zip(img_class_h, img_class_p):
+                if i != None or y != None:
+                    img_class_h = i.text
+                    img_class_p = y.text
+                    img_class_h = 'Heading : ' + img_class_h + '\n'
+                    img_class_p = 'Paragraph : ' + img_class_p + '\n'
+                    content.append(img_class_h)
+                    content.append(img_class_p)
+
+
+
+      
+
+    url_split = url.split('/')        
+    blog_file_name = url_split[-2]
+    blog_file_name
+
+    path = f"C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Home_Resource_Blogs/{blog_file_name}.text"
+
+    with open(path, "w", encoding="utf-8") as file:
+        file.write(content)
+
+    print('Successfully Created The Blog File')
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+# Home/fsn-suppliers
+
+
+# This block of code is to create an excel scraping the details of Home/fsn-suppliers pages
+
+import requests as re
+from bs4 import BeautifulSoup
+import json
+import pandas as pd
+import time
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image
+from IPython.display import HTML
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+
+
+
+class_list = []
+img_alt_list = []
+img_src_list = []
+img_heading_list = []
+img_catagory = []
+supplier_info_link = []
+image = []
+headquarters_regions_list = []
+founded_date_list = []
+discription_class_list = []
+
+for i in range(1,9):
+    
+    base_url = 'https://franchisesuppliernetwork.com'
+    add_on = '/fsn-suppliers/'
+    pages = f'page/{i}/'
+    url = base_url + add_on + pages
+    response  = re.get(url, headers=headers)
+
+    soup = BeautifulSoup(response.text, 'lxml')
+
+    main_tag = soup.find_all('div',class_='fs-container page-fs')
+    image_access = soup.find_all('div',class_=['fs-single'])
+    catagory_access = soup.find_all('div',class_='featured-catg-btns')
+
+
+    for i in main_tag:
+        image_class = i.find_all('div')
+        for x in image_class:
+            image_class_name = x['class']
+            image_class_name = ' '.join(image_class_name)
+            class_list.append(image_class_name)
+
+
+    for i in image_access:
+        image_url = i.find('img')
+        h3_tag = i.find('h3')
+        supplier_link = i.find('a')
+        supplier_infolink = supplier_link['href']
+
+        image_alt = image_url['alt']
+        image_src = image_url['src']
+        image_heading = h3_tag.text
+        img_heading_list.append(image_heading)
+        supplier_info_link.append(supplier_infolink)
+        img_alt_list.append(image_alt)
+        img_src_list.append(image_src)
+        
+    for i in image_access:
+        image_url = i.find('img')
+        image_src = '<img src="' + image_url['src'] + '">'
+        image.append(image_src)
+
+
+    for i in catagory_access:
+        x = i.text
+        x = x.replace('\n',' | ')
+        img_catagory.append(x)
+        time.sleep(1)
+        
+
+    for i in supplier_info_link:
+        response  = re.get(i, headers=headers)
+        soup = BeautifulSoup(response.text, 'lxml')
+
+        founded_date_class = soup.find_all('div',class_='col-lg-12')
+        founded_date = founded_date_class[0].find('p')
+        founded_date = founded_date.text
+        founded_date = founded_date.split()[-1]
+        founded_date_list.append(founded_date)
+
+        headquarters_regions_class = soup.find_all('div',class_='col-lg-6')
+        headquarters_regions = headquarters_regions_class[-1]
+        headquarters_regions = headquarters_regions.text
+        headquarters_regions = headquarters_regions.split()[2:]
+        headquarters_regions = ' '.join(headquarters_regions)
+        headquarters_regions_list.append(headquarters_regions)
+
+
+        discription_class = soup.find_all('div', id ='contentMain')
+        if discription_class:
+            discription_class = discription_class[-1].text
+            discription_class_list.append(discription_class)
+        else:
+            discription_class_list.append('NA')
+
+
+        
+    
+# If want to just create a excel uncomment the below block of code and comment the last block of code.
+data_1 = {'Supplier_Name':img_heading_list, 'Catagory':img_catagory, 'Links':img_src_list,'Supplier_Page_Link':supplier_info_link, 'Alt':img_alt_list}
+data_2 = {'discription':discription_class_list,'Founded_Date':founded_date_list,'Headquarters_Regions':headquarters_regions_list}
+df1 = pd.DataFrame(data_1)
+df2 = pd.DataFrame(data_2)
+path1 = "C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Home_FSN_Suppliers_Details_1.xlsx"
+path2 = "C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Home_FSN_Suppliers_Details_2.xlsx"
+df1.to_excel(path1, index = False)
+df2.to_excel(path2, index = False)
+print('EXCEL CREATED')
+
+
+# # If want to just view the dataframe on jupiter notebook (this will display the images in the results)
+# data = {'Supplier_Name':img_heading_list, 'Catagory':img_catagory,'Image': image, 'Links':img_src_list,'Supplier_Page_Link':supplier_info_link,'Founded_Date':founded_date_list,'Headquarters_Regions':headquarters_regions_list, 'Alt':img_alt_list}
+# df = pd.DataFrame(data)
+# pd.set_option('display.max_colwidth', None)
+# pd.set_option('display.max_rows', None)
+# pd.set_option('display.max_columns', None)
+# HTML(df.to_html(escape=False))
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Home/fsn-suppliers/image_downloader
+
+# This block of code is for downloading images present at Home/fsn-suppliers pages.
+
+import requests as re
+from bs4 import BeautifulSoup
+import json
+import pandas as pd
+import time
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image
+from IPython.display import HTML
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+image = []
+
+
+for i in range(1,9):
+    
+    base_url = 'https://franchisesuppliernetwork.com'
+    add_on = '/fsn-suppliers/'
+    pages = f'page/{i}/'
+    url = base_url + add_on + pages
+    response  = re.get(url, headers=headers)
+
+    soup = BeautifulSoup(response.text, 'lxml')
+    image_access = soup.find_all('div',class_=['fs-single'])
+    
+
+        
+    for i in image_access:
+        image_url = i.find('img')
+        image_src = image_url['src']
+        image.append(image_src)
+        
+        
+data = {'Image': image}
+
+df = pd.DataFrame(data)
+
+
+# Download images
+for index, row in df.iterrows():
+    Image = row['Image']
+    file_name = Image.split('/')[-1]
+
+    if Image != "NA":  # Download only if image link exists
+        image_path = f"C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Image_folder/Fsn_Suppliers_Images/{file_name}"
+        with open(image_path, 'wb') as f:
+            im = requests.get(Image)
+            f.write(im.content)
+        print(f"Downloaded image: {Image}")
+        
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Home/About
+import requests as re
+from bs4 import BeautifulSoup
+import json
+import pandas as pd
+import time
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image
+from IPython.display import HTML
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+
+paras = []
+
+
+    
+base_url = 'https://franchisesuppliernetwork.com'
+add_on = '/about/'
+url = base_url + add_on
+response  = re.get(url, headers=headers)
+
+soup = BeautifulSoup(response.text, 'lxml')
+
+start = soup.find('div',class_='col-lg-12 contentside')
+
+content = []
+
+start_heading = start.find('h2').text
+start_heading = str(start_heading).strip(':')
+sec_heading = '\n' + start_heading + '\n'
+content.append(start_heading)
+
+start_para = start.find_all('p')
+
+for i in start_para:
+    para = i.text
+    paras.append(para)
+    content.append(para)
+    
+    
+sec_heading = soup.find('h2',style='text-align: center;')
+sec_heading = sec_heading.text
+sec_heading = '\n' + sec_heading + '\n'
+content.append(sec_heading)
+
+
+team_class = soup.find_all('div',class_='row team-row')
+for i in team_class:
+    team_person_1 = i.find_all('div', class_='col-md-3')
+    team_person_2 = i.find_all('div', class_='col-md-9')
+    for x, y in zip(team_person_1,team_person_2):
+        team_person_img = x.find('img')
+        team_person_img = team_person_img['src']
+        team_person_img = team_person_img + '\n'
+        team_person_name = y.find('h3')
+        team_person_name = team_person_name.text
+        team_person_designation = y.find('h4')
+        team_person_designation = team_person_designation.text
+        team_person_para = y.find_all('p')
+        name.append(team_person_name)
+        image.append(team_person_img)
+        designation.append(team_person_designation)
+        content.append(team_person_name)
+        content.append(team_person_designation)
+        content.append(team_person_img)
+        
+        for i in team_person_para:
+            team_person_para = i.text
+            team_person_para = '\n' + team_person_para +'\n'
+            content.append(team_person_para)
+        
+        
+
+
+
+
+content = '\n'.join(content)               
+# print(content)
+
+path = f"C:/Users/Kunwar Rajeev Singh/Desktop/Ezeeassist_Assignment/Home_About_Details.text"
+
+with open(path, "w", encoding="utf-8") as file:
+    file.write(content)
+
+print('Successfully Created The Blog File')
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+
